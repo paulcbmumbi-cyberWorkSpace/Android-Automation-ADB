@@ -21,6 +21,24 @@ def enable_usb_debugging() -> None:
         print(f"Failed to enable USB Debugging: {e}")
 
 
+def get_device_serial() -> str | None:
+    adb = _adb_executable()
+    if adb is None:
+        print("ADB is not installed or not available in PATH.")
+        return None
+
+    try:
+        result = subprocess.run([adb, "get-serialno"], check=True, capture_output=True, text=True)
+        serial_number = result.stdout.strip()
+        if serial_number == "unknown":
+            print("No device connected or ADB not authorized.")
+            return None
+        return serial_number
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to get device serial number: {e}")
+        return None
+
+
 def open_android_settings() -> None:
     adb = _adb_executable()
     if adb is None:
