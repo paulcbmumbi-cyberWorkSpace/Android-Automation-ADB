@@ -4,16 +4,19 @@ from pathlib import Path
 
 
 def _adb_executable() -> str | None:
+    """Return the ADB executable found through the system PATH."""
     return shutil.which("adb")
 
 
 def enable_usb_debugging() -> None:
+    """Enable Android USB debugging through the connected device's settings."""
     adb = _adb_executable()
     if adb is None:
         print("ADB is not installed or not available in PATH.")
         return
 
     try:
+        # Confirm communication before attempting to change the device setting.
         subprocess.run([adb, "devices"], check=True, capture_output=True, text=True)
         subprocess.run([adb, "shell", "settings", "put", "global", "adb_enabled", "1"], check=True, capture_output=True, text=True)
         print("USB Debugging enabled successfully.")
@@ -22,6 +25,7 @@ def enable_usb_debugging() -> None:
 
 
 def get_device_serial() -> str | None:
+    """Return the connected device serial number, or None when unavailable."""
     adb = _adb_executable()
     if adb is None:
         print("ADB is not installed or not available in PATH.")
@@ -40,6 +44,7 @@ def get_device_serial() -> str | None:
 
 
 def open_android_settings() -> None:
+    """Launch the main Android Settings screen on the connected device."""
     adb = _adb_executable()
     if adb is None:
         print("ADB is not installed or not available in PATH.")
@@ -53,17 +58,20 @@ def open_android_settings() -> None:
 
 
 def _device_file_exists(adb: str, device_path: str) -> bool:
+    """Check whether a file or directory exists at the specified device path."""
     result = subprocess.run([adb, "shell", "test", "-e", device_path], check=False, capture_output=True, text=True)
     return result.returncode == 0
 
 
 def move_file_to_device(local_path: Path | None = None, device_path: str = "/sdcard/APK") -> None:
+    """Copy a local file or directory to the Android device with ADB."""
     adb = _adb_executable()
     if adb is None:
         print("ADB is not installed or not available in PATH.")
         return
 
     if local_path is None:
+        # Use the APK folder beside this script when no source is provided.
         local_path = Path(__file__).resolve().parent / "APK"
 
     if not local_path.exists():
@@ -71,6 +79,7 @@ def move_file_to_device(local_path: Path | None = None, device_path: str = "/sdc
         return
 
     if local_path.is_dir():
+        # Push files individually so existing remote files can be preserved.
         for local_file in sorted(local_path.iterdir()):
             if not local_file.is_file():
                 continue
@@ -102,12 +111,14 @@ def move_file_to_device(local_path: Path | None = None, device_path: str = "/sdc
 
 
 def install_apk(apk_path: Path | None = None) -> None:
+    """Install one APK or all APK files in a local directory on the device."""
     adb = _adb_executable()
     if adb is None:
         print("ADB is not installed or not available in PATH.")
         return
 
     if apk_path is None:
+        # Use the APK folder beside this script when no source is provided.
         apk_path = Path(__file__).resolve().parent / "APK"
 
     if not apk_path.exists():
@@ -116,6 +127,7 @@ def install_apk(apk_path: Path | None = None) -> None:
 
     apk_files = []
     if apk_path.is_dir():
+        # Keep installation order predictable when a directory is supplied.
         apk_files = sorted(apk_path.glob("*.apk"))
         if not apk_files:
             print(f"No APK files found in directory: {apk_path}")
