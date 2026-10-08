@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "android-automation-adb"
+version = "0.1.0"
+description = "ADB automation utilities for Android device setup and inventory"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "openpyxl>=3.1.5",
+  "pyttsx3>=2.90",
+]
+
+[project.scripts]
+auto-adb = "scripts.auto_adb:main"
+collect-device-info = "scripts.collect_device_info:collect_device_info"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["scripts*"]

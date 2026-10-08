@@ -6,7 +6,7 @@ from pathlib import Path
 from openpyxl import Workbook, load_workbook
 
 
-OUTPUT_WORKBOOK = Path(__file__).resolve().parent / "device_info.xlsx"
+OUTPUT_WORKBOOK = Path(__file__).resolve().parent.parent / "device_info.xlsx"
 
 
 def get_adb_executable() -> str | None:

@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+
+# Editor
+.vscode/
+.idea/
+
+# Project artifacts
+APK/*.apk
+APK/*.APK
+*.xlsx
+*.log
+
+dist/
+build/
+*.egg-info/
